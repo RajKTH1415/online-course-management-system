@@ -17,8 +17,8 @@ public class Lesson {
     private Long id;
 
     private String title;
-    private String videoUrl; // or filePath
-    private Integer duration; // in minutes
+    private String videoUrl;
+    private Integer duration;
 
     @ManyToOne
     private Course course;

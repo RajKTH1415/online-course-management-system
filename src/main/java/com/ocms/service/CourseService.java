@@ -21,4 +21,8 @@ public interface CourseService {
     List<User> getEnrolledStudents(Long courseId);
 
     Review addReview(Long courseId, ReviewRequest request, String studentEmail);
+
+    Course updateCourse(Long courseId, CourseRequest request, String instructorEmail);
+
+    void deleteCourse(Long courseId, String instructorEmail);
 }

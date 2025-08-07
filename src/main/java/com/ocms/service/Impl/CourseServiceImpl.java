@@ -36,8 +36,6 @@ public class CourseServiceImpl implements CourseService {
     private ReviewRepository reviewRepository;
 
 
-
-
     @Override
     public Course createCourse(CourseRequest request, String instructorEmail) {
         User instructor = userRepository.findByEmail(instructorEmail)
@@ -100,5 +98,36 @@ public class CourseServiceImpl implements CourseService {
                 .comment(request.getComment())
                 .build();
         return reviewRepository.save(review);
+    }
+
+    @Override
+    public Course updateCourse(Long courseId, CourseRequest request, String instructorEmail) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CustomException("Course not found"));
+
+        if (!course.getInstructor().getEmail().equals(instructorEmail)) {
+            throw new CustomException("Unauthorized to update this course");
+        }
+
+        course.setTitle(request.getTitle());
+        course.setDescription(request.getDescription());
+        course.setCategory(request.getCategory());
+        course.setLevel(request.getLevel());
+        course.setPrice(request.getPrice());
+        course.setStatus(CourseStatus.PENDING);
+
+        return courseRepository.save(course);
+    }
+
+    @Override
+    public void deleteCourse(Long courseId, String instructorEmail) {
+        Course course = courseRepository.findById(courseId)
+                .orElseThrow(() -> new CustomException("Course not found"));
+
+        if (!course.getInstructor().getEmail().equals(instructorEmail)) {
+            throw new CustomException("Unauthorized to delete this course");
+        }
+
+        courseRepository.delete(course);
     }
 }
