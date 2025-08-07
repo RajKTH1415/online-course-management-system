@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
@@ -29,7 +30,7 @@ public class Course {
     private User instructor;
 
     @Enumerated(EnumType.STRING)
-    private CourseStatus status; // PENDING, APPROVED, REJECTED
+    private CourseStatus status;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<Lesson> lessons = new ArrayList<>();

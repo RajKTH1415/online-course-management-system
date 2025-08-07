@@ -22,6 +22,6 @@ public class Review {
     @ManyToOne
     private Course course;
 
-    private int rating; // 1-5
+    private int rating;
     private String comment;
 }
