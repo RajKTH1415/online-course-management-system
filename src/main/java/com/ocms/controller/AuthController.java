@@ -1,5 +1,6 @@
 package com.ocms.controller;
 
+import com.ocms.dtos.AuthResponse;
 import com.ocms.dtos.LoginRequest;
 import com.ocms.dtos.RegisterRequest;
 import com.ocms.entity.User;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,30 +20,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    @Autowired private UserService userService;
+    @Autowired private AuthenticationManager authenticationManager;
+    @Autowired private JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        User user = userService.register(request);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
+        User u = userService.register(req);
+        return ResponseEntity.ok(u);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        org.springframework.security.authentication.UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(), request.getPassword());
-        authenticationManager.authenticate(authToken);
-        UserDetails userDetails =
-                new org.springframework.security.core.userdetails.User(request.getEmail(), request.getPassword(), new java.util.ArrayList<>());
-        String token = jwtUtil.generateToken(userDetails);
-        return ResponseEntity.ok(java.util.Map.of("token", token));
+    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword())
+        );
+        String token = jwtUtil.generateToken(auth);
+        return ResponseEntity.ok(new AuthResponse(token));
     }
-
 }

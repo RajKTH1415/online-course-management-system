@@ -19,9 +19,7 @@ public class StudentController {
     private EnrollmentService enrollmentService;
 
     @GetMapping("/courses")
-    public ResponseEntity<?> getAllCourses() {
-        return ResponseEntity.ok(courseService.getAllApprovedCourses());
-    }
+    public ResponseEntity<?> getAllCourses() { return ResponseEntity.ok(courseService.getAllApprovedCourses()); }
 
     @PostMapping("/courses/{id}/enroll")
     public ResponseEntity<?> enroll(@PathVariable Long id, Principal principal) {

@@ -1,13 +1,9 @@
 package com.ocms.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import java.util.*;
 
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Data
@@ -15,18 +11,19 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Enrollment {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne @JoinColumn(name = "student_id", nullable = false)
     private User student;
 
-    @ManyToOne
+    @ManyToOne @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 
-    private boolean paymentDone;
+    private boolean paymentDone = false;
 
     @ElementCollection
+    @CollectionTable(name = "enrollment_completed_lessons", joinColumns = @JoinColumn(name = "enrollment_id"))
+    @Column(name = "lesson_id")
     private Set<Long> completedLessonIds = new HashSet<>();
 }

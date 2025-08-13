@@ -1,10 +1,7 @@
 package com.ocms.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Data
@@ -12,16 +9,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Review {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Integer rating;
+    private String comment;
 
     @ManyToOne
+    @JoinColumn(name = "student_id")
     private User student;
 
     @ManyToOne
+    @JoinColumn(name = "course_id")
     private Course course;
-
-    private int rating;
-    private String comment;
 }

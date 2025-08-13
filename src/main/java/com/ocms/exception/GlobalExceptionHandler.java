@@ -8,13 +8,13 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<?> handleCustomException(CustomException ex) {
-        return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+    public ResponseEntity<?> handleCustom(CustomException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Internal server error"));
+    public ResponseEntity<?> handleAll(Exception ex) {
+        ex.printStackTrace();
+        return ResponseEntity.internalServerError().body("Internal error: " + ex.getMessage());
     }
 }

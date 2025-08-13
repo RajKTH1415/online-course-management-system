@@ -1,12 +1,9 @@
 package com.ocms.dtos;
-
+import com.ocms.dtos.LessonRequest;
 import lombok.Data;
-
 import java.util.List;
-
 @Data
-public class CourseRequest{
-
+public class CourseRequest {
     private String title;
     private String description;
     private String category;

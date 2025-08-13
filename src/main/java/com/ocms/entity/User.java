@@ -2,19 +2,16 @@ package com.ocms.entity;
 
 import com.ocms.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
+@Table(name = "users_table")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -26,4 +23,7 @@ public class User {
     private Role role;
 
     private boolean enabled = true;
+    private boolean blocked = false;
+
+
 }

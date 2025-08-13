@@ -21,7 +21,7 @@ public class InstructorController {
     }
 
     @GetMapping("/courses/{id}/students")
-    public ResponseEntity<?> getEnrolledStudents(@PathVariable Long id) {
+    public ResponseEntity<?> getEnrolledStudents(@PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(courseService.getEnrolledStudents(id));
     }
 }

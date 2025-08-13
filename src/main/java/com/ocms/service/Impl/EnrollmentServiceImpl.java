@@ -34,7 +34,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         Enrollment enrollment = Enrollment.builder()
                 .student(student)
                 .course(course)
-                .paymentDone(true)
+                .paymentDone(true) // simulate payment
                 .build();
         return enrollmentRepository.save(enrollment);
     }

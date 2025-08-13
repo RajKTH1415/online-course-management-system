@@ -1,55 +1,89 @@
+
 package com.ocms.service.Impl;
 
 import com.ocms.dtos.CourseRequest;
 import com.ocms.dtos.ReviewRequest;
-import com.ocms.entity.Course;
-import com.ocms.entity.Enrollment;
-import com.ocms.entity.Review;
-import com.ocms.entity.User;
+import com.ocms.entity.*;
 import com.ocms.enums.CourseStatus;
+import com.ocms.enums.Role;
 import com.ocms.exception.CustomException;
-import com.ocms.repository.CourseRepository;
-import com.ocms.repository.EnrollmentRepository;
-import com.ocms.repository.ReviewRepository;
-import com.ocms.repository.UserRepository;
+import com.ocms.repository.*;
 import com.ocms.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CourseService {
 
-
     @Autowired
     private CourseRepository courseRepository;
-
     @Autowired
     private UserRepository userRepository;
-
+    @Autowired
+    private LessonRepository lessonRepository;
     @Autowired
     private EnrollmentRepository enrollmentRepository;
-
     @Autowired
     private ReviewRepository reviewRepository;
 
 
     @Override
-    public Course createCourse(CourseRequest request, String instructorEmail) {
-        User instructor = userRepository.findByEmail(instructorEmail)
-                .orElseThrow(() -> new CustomException("Instructor not found"));
-        Course course = Course.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .category(request.getCategory())
-                .level(request.getLevel())
-                .price(request.getPrice())
+    @Transactional
+    public Course createCourse(CourseRequest req, String instructorEmail) {
+
+        User instructor = userRepository.findByEmail(instructorEmail).orElseThrow(() -> new CustomException("Instructor not found"));
+        if (instructor.getRole() != Role.INSTRUCTOR && instructor.getRole() != Role.ADMIN)
+            throw new CustomException("Only instructors can create courses");
+        Course c = Course.builder()
+                .title(req.getTitle())
+                .description(req.getDescription())
+                .category(req.getCategory())
+                .level(req.getLevel())
+                .price(req.getPrice())
                 .instructor(instructor)
                 .status(CourseStatus.PENDING)
                 .build();
-        return courseRepository.save(course);
+        List<Lesson> lessons = Optional.ofNullable(req.getLessons()).orElse(Collections.emptyList())
+                .stream()
+                .map(l -> Lesson.builder().title(l.getTitle()).videoUrl(l.getVideoUrl()).duration(l.getDuration()).course(c).build())
+                .collect(Collectors.toList());
+        c.setLessons(lessons);
+        return courseRepository.save(c);
+    }
+
+    @Override
+    public Course updateCourse(Long courseId, CourseRequest req, String instructorEmail) {
+        Course c = courseRepository.findById(courseId).orElseThrow(() -> new CustomException("Course not found"));
+        if (!c.getInstructor().getEmail().equals(instructorEmail) && c.getInstructor().getRole()!=Role.ADMIN) {
+            throw new CustomException("Not authorized to edit");
+        }
+        c.setTitle(req.getTitle());
+        c.setDescription(req.getDescription());
+        c.setCategory(req.getCategory());
+        c.setLevel(req.getLevel());
+        c.setPrice(req.getPrice());
+        // reset lessons
+        c.getLessons().clear();
+        List<Lesson> lessons = Optional.ofNullable(req.getLessons()).orElse(Collections.emptyList())
+                .stream()
+                .map(l -> Lesson.builder().title(l.getTitle()).videoUrl(l.getVideoUrl()).duration(l.getDuration()).course(c).build())
+                .collect(Collectors.toList());
+        c.getLessons().addAll(lessons);
+        c.setStatus(CourseStatus.PENDING);
+        return courseRepository.save(c);
+    }
+
+    @Override
+    public void deleteCourse(Long courseId, String instructorEmail) {
+        Course c = courseRepository.findById(courseId).orElseThrow(() -> new CustomException("Course not found"));
+        if (!c.getInstructor().getEmail().equals(instructorEmail) && c.getInstructor().getRole()!=Role.ADMIN) {
+            throw new CustomException("Not authorized to delete");
+        }
+        courseRepository.delete(c);
     }
 
     @Override
@@ -58,76 +92,35 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void approveCourse(Long id) {
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Course not found"));
-        course.setStatus(CourseStatus.APPROVED);
-        courseRepository.save(course);
+    public void approveCourse(Long courseId) {
+        Course c = courseRepository.findById(courseId).orElseThrow(() -> new CustomException("Course not found"));
+        c.setStatus(CourseStatus.APPROVED);
+        courseRepository.save(c);
     }
 
     @Override
-    public void rejectCourse(Long id) {
-        Course course = courseRepository.findById(id)
-                .orElseThrow(() -> new CustomException("Course not found"));
-        course.setStatus(CourseStatus.REJECTED);
-        courseRepository.save(course);
+    public void rejectCourse(Long courseId) {
+        Course c = courseRepository.findById(courseId).orElseThrow(() -> new CustomException("Course not found"));
+        c.setStatus(CourseStatus.REJECTED);
+        courseRepository.save(c);
     }
 
     @Override
     public List<User> getEnrolledStudents(Long courseId) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new CustomException("Course not found"));
-        List<Enrollment> enrollments = enrollmentRepository.findByCourse(course);
+        Course c = courseRepository.findById(courseId).orElseThrow(() -> new CustomException("Course not found"));
+        var enrollments = enrollmentRepository.findByCourse(c);
         List<User> students = new ArrayList<>();
-        for (Enrollment e : enrollments) {
-            students.add(e.getStudent());
-        }
+        enrollments.forEach(e -> students.add(e.getStudent()));
         return students;
     }
 
     @Override
-    public Review addReview(Long courseId, ReviewRequest request, String studentEmail) {
-        User student = userRepository.findByEmail(studentEmail)
-                .orElseThrow(() -> new CustomException("Student not found"));
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new CustomException("Course not found"));
-        Review review = Review.builder()
-                .student(student)
-                .course(course)
-                .rating(request.getRating())
-                .comment(request.getComment())
-                .build();
-        return reviewRepository.save(review);
-    }
-
-    @Override
-    public Course updateCourse(Long courseId, CourseRequest request, String instructorEmail) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new CustomException("Course not found"));
-
-        if (!course.getInstructor().getEmail().equals(instructorEmail)) {
-            throw new CustomException("Unauthorized to update this course");
-        }
-
-        course.setTitle(request.getTitle());
-        course.setDescription(request.getDescription());
-        course.setCategory(request.getCategory());
-        course.setLevel(request.getLevel());
-        course.setPrice(request.getPrice());
-        course.setStatus(CourseStatus.PENDING);
-
+    public Course addReview(Long courseId, ReviewRequest req, String studentEmail) {
+        User student = userRepository.findByEmail(studentEmail).orElseThrow(() -> new CustomException("Student not found"));
+        Course course = courseRepository.findById(courseId).orElseThrow(() -> new CustomException("Course not found"));
+        Review r = Review.builder().rating(req.getRating()).comment(req.getComment()).student(student).course(course).build();
+        reviewRepository.save(r);
+        course.getReviews().add(r);
         return courseRepository.save(course);
-    }
-
-    @Override
-    public void deleteCourse(Long courseId, String instructorEmail) {
-        Course course = courseRepository.findById(courseId)
-                .orElseThrow(() -> new CustomException("Course not found"));
-
-        if (!course.getInstructor().getEmail().equals(instructorEmail)) {
-            throw new CustomException("Unauthorized to delete this course");
-        }
-
-        courseRepository.delete(course);
     }
 }

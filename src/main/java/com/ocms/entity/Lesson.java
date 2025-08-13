@@ -17,9 +17,10 @@ public class Lesson {
     private Long id;
 
     private String title;
-    private String videoUrl;
-    private Integer duration;
+    private String videoUrl; // accept video link or pdfPath
+    private Integer duration; // minutes
 
     @ManyToOne
+    @JoinColumn(name = "course_id", nullable = false)
     private Course course;
 }

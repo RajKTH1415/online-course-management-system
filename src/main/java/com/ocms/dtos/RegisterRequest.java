@@ -1,11 +1,8 @@
 package com.ocms.dtos;
-
-import com.ocms.enums.Role;
 import lombok.Data;
-
 @Data
 public class RegisterRequest {
-    private String email;
+    private String username; // email
     private String password;
-    private Role role;
+    private String role; // ADMIN, INSTRUCTOR, STUDENT
 }
