@@ -32,4 +32,10 @@ public class InstructorController {
     public ResponseEntity<?> getEnrolledStudents(@PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(courseService.getEnrolledStudents(id));
     }
+    @DeleteMapping("/courses/{id}")
+    public ResponseEntity<?> deleteCourse(@PathVariable Long id, Principal principal){
+        courseService.deleteCourse(id,principal.getName());
+        return ResponseEntity.ok("Course has been deleted");
+
+    }
 }
