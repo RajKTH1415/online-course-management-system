@@ -7,6 +7,7 @@ import com.ocms.exception.CustomException;
 import com.ocms.repository.UserRepository;
 import com.ocms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,5 +58,11 @@ public class UserServiceImpl implements UserService {
         User u = userRepository.findById(id).orElseThrow(() -> new CustomException("User not found"));
         u.setBlocked(false);
         userRepository.save(u);
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByEmail(username)
+                .orElseThrow(() -> new CustomException("User not found: " + username));
     }
 }

@@ -9,4 +9,6 @@ public interface UserService  {
     User findByEmail(String email);
     void blockUser(Long id);
     void unblockUser(Long id);
+
+    User findByUsername(String username);
 }
