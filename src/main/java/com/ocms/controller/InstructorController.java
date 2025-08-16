@@ -20,6 +20,14 @@ public class InstructorController {
         return ResponseEntity.ok(courseService.createCourse(request, principal.getName()));
     }
 
+    @PutMapping("/courses/{id}")
+    public ResponseEntity<?> updateCourse(
+            @PathVariable Long id,
+            @RequestBody CourseRequest request,
+            Principal principal) {
+        return ResponseEntity.ok(courseService.updateCourse(id, request, principal.getName()));
+    }
+
     @GetMapping("/courses/{id}/students")
     public ResponseEntity<?> getEnrolledStudents(@PathVariable Long id, Principal principal) {
         return ResponseEntity.ok(courseService.getEnrolledStudents(id));

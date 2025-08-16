@@ -1,5 +1,6 @@
 package com.ocms.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,10 +18,11 @@ public class Lesson {
     private Long id;
 
     private String title;
-    private String videoUrl; // accept video link or pdfPath
-    private Integer duration; // minutes
+    private String videoUrl;
+    private Integer duration;
 
     @ManyToOne
     @JoinColumn(name = "course_id", nullable = false)
+    @JsonBackReference
     private Course course;
 }

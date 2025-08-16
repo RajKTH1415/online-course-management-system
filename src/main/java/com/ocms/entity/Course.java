@@ -1,5 +1,6 @@
 package com.ocms.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.ocms.enums.CourseStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -30,6 +31,7 @@ public class Course {
     private CourseStatus status = CourseStatus.PENDING;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Lesson> lessons = new ArrayList<>();
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
