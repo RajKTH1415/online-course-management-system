@@ -38,4 +38,9 @@ public class InstructorController {
         return ResponseEntity.ok("Course has been deleted");
 
     }
+    @GetMapping("/courses/{id}")
+    public ResponseEntity<?>getCourseById(@PathVariable Long id){
+        return  ResponseEntity.ok(courseService.getCourseById(id));
+
+    }
 }

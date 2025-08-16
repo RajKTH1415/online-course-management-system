@@ -15,6 +15,8 @@ public interface CourseService {
 
     void deleteCourse(Long courseId, String instructorEmail);
 
+    Course getCourseById(Long courseId);
+
     List<Course> getAllApprovedCourses();
 
     void approveCourse(Long courseId);

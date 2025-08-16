@@ -87,6 +87,12 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public Course getCourseById(Long courseId) {
+        return courseRepository.findById(courseId)
+                .orElseThrow(()-> new CustomException("Course not found"));
+    }
+
+    @Override
     public List<Course> getAllApprovedCourses() {
         return courseRepository.findByStatus(CourseStatus.APPROVED);
     }
