@@ -7,9 +7,13 @@ import com.ocms.exception.CustomException;
 import com.ocms.repository.UserRepository;
 import com.ocms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -19,6 +23,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
 
     @Override
     public User register(RegisterRequest req) {
@@ -65,4 +70,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(username)
                 .orElseThrow(() -> new CustomException("User not found: " + username));
     }
+
+
 }

@@ -4,6 +4,8 @@ import com.ocms.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users_table")
 @Data
@@ -24,6 +26,10 @@ public class User {
 
     private boolean enabled = true;
     private boolean blocked = false;
+
+    private String resetToken;
+
+    private LocalDateTime resetTokenExpiry;
 
 
 }

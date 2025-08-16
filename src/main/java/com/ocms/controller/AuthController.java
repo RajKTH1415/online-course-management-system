@@ -1,11 +1,10 @@
 package com.ocms.controller;
 
-import com.ocms.dtos.ApiResponse;
-import com.ocms.dtos.AuthResponse;
-import com.ocms.dtos.LoginRequest;
-import com.ocms.dtos.RegisterRequest;
+import com.ocms.dtos.*;
 import com.ocms.entity.User;
+import com.ocms.exception.CustomException;
 import com.ocms.security.JwtUtil;
+import com.ocms.service.Impl.PasswordResetServiceImpl;
 import com.ocms.service.Impl.TokenBlacklistService;
 import com.ocms.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +33,9 @@ public class AuthController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private PasswordResetServiceImpl passwordResetService;
 
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
@@ -149,6 +151,32 @@ public class AuthController {
                             "AUTH-500"
                     ));
         }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Object>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        try {
+            passwordResetService.generateResetToken(request.getUsername());
+            return ResponseEntity.ok(new ApiResponse<>(true, "Rest link sent to your  mail", null));
+        } catch (CustomException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse<>(false, e.getMessage(), null, "USER_NOT_FOUND"));
+
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Object>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        try {
+            passwordResetService.resetPassword(request.getToken(), request.getNewPassword());
+            return ResponseEntity.ok(new ApiResponse<>(true, "Password reset successful", null));
+
+
+        } catch (CustomException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>(false, e.getMessage(), null, "INVALID_TOKEN"));
+        }
+
     }
 }
 
