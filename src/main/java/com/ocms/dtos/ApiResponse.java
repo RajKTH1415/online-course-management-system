@@ -22,4 +22,11 @@ public class ApiResponse<T> {
         this.errorCode = null;
         this.timestamp = LocalDateTime.now();
     }
+    public ApiResponse(boolean success, String message, T data, String errorCode) {
+        this.success = success;
+        this.message = message;
+        this.data = data;
+        this.errorCode = errorCode;
+        this.timestamp = LocalDateTime.now();
+    }
 }

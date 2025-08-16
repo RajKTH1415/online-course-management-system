@@ -1,5 +1,6 @@
 package com.ocms.security;
 
+import com.ocms.service.Impl.TokenBlacklistService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +20,9 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired private JwtUtil jwtUtil;
     @Autowired private UserDetailsService userDetailsService;
 
+    @Autowired
+    private TokenBlacklistService tokenBlacklistService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
@@ -26,6 +30,14 @@ public class JwtFilter extends OncePerRequestFilter {
         String username = null;
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
+
+
+            if (tokenBlacklistService.isTokenBlacklisted(token)){
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("{\"success\":false,\"message\":\"Token is invalid. Please login again.\",\"data\":null,\"errorCode\":\"AUTH-003\"}");
+                return;
+            }
+
             if (jwtUtil.validate(token)) {
                 username = jwtUtil.getUsernameFromToken(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
