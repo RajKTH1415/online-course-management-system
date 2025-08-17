@@ -17,32 +17,44 @@ public class PasswordResetServiceImpl implements PasswordResetService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    private final EmailServiceImpl emailService;
 
-    public PasswordResetServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JavaMailSender mailSender, EmailServiceImpl emailService) {
+
+    public PasswordResetServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, JavaMailSender mailSender, EmailServiceImpl emailService, EmailServiceImpl emailService1) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
 
+        this.emailService = emailService1;
     }
 
-
     @Override
-    public void generateResetToken(String username) {
+    public String generateResetToken(String username) {
 
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new CustomException("User not found"));
 
-        String token = UUID.randomUUID().toString(); // Unique reset token
+        String token = UUID.randomUUID().toString();
+        LocalDateTime expiryTime = LocalDateTime.now().plusMinutes(30);
+
         user.setResetToken(token);
-        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(30)); // Token valid for 30 minutes
+        user.setResetTokenExpiry(expiryTime); // Token valid for 30 minutes
         userRepository.save(user);
 
-        // Send token via email (real-world: use EmailService)
-        System.out.println("Password reset link: http://localhost:8080/api/auth/reset-password?token=" + token);
 
+        //System.out.println("Password reset link: http://localhost:8080/api/auth/reset-password?token=" + token);
+
+        //return "Password reset link: http://localhost:8080/api/auth/reset-password?token=\" " + token;
+
+        String subject = "Password Reset Request";
+        String body = "Here is your password reset token: " + token +
+                "\nThis token will expire at: " + expiryTime;
+        emailService.sendEmail(user.getEmail(), subject, body);
+
+        return token;
     }
 
     @Override
-    public void resetPassword(String token, String newPassword) {
+    public String resetPassword(String token, String newPassword) {
         User user = userRepository.findByResetToken(token)
                 .orElseThrow(() -> new CustomException("Invalid token"));
 
@@ -56,5 +68,6 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         user.setResetTokenExpiry(null);
         userRepository.save(user);
 
+        return "Password successfully reset";
     }
 }
