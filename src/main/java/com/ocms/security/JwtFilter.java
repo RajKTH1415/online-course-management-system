@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -25,6 +27,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Autowired
     private TokenBlacklistService tokenBlacklistService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -37,7 +42,16 @@ public class JwtFilter extends OncePerRequestFilter {
 
             if (tokenBlacklistService.isTokenBlacklisted(token)){
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("{\"success\":false,\"message\":\"Token is invalid. Please login again.\",\"data\":null,\"errorCode\":\"AUTH-003\"}");
+                response.setContentType("application/json");
+//                response.getWriter().write("{\"success\":false,\"message\":\"Token is invalid. Please login again.\",\"data\":null,\"errorCode\":\"AUTH-003\"}");
+//                return;
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Token is invalid. Please login again.");
+                errorResponse.put("data", null);
+                errorResponse.put("errorCode", "AUTH-003");
+
+                response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
                 return;
             }
 

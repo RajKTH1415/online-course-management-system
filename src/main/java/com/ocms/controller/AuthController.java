@@ -7,16 +7,19 @@ import com.ocms.security.JwtUtil;
 import com.ocms.service.Impl.PasswordResetServiceImpl;
 import com.ocms.service.Impl.TokenBlacklistService;
 import com.ocms.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -26,6 +29,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Authentication API Controller", description = "Endpoints for user authentication and account management")
 public class AuthController {
 
     @Autowired
@@ -42,6 +46,20 @@ public class AuthController {
     private TokenBlacklistService tokenBlacklistService;
 
 
+
+    @Operation(
+            summary = "Register a new user",
+            description = "Creates a new user account with email, password, and role."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User registered successfully",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid input",
+                    content = @Content),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "409", description = "User already exists",
+                    content = @Content)
+    })
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<?>> register(@Valid @RequestBody RegisterRequest req) {
 
@@ -87,6 +105,22 @@ public class AuthController {
     }
 
 
+    @Operation(
+            summary = "User Login",
+            description = "Authenticates a user and returns a JWT token along with user details.",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                            responseCode = "200",
+                            description = "Login successful",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ApiResponse.class) // <-- your wrapper class
+                            )
+                    ),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Invalid username or password"),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error")
+            }
+    )
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody LoginRequest req) {
         Authentication auth = authenticationManager.authenticate(
@@ -111,6 +145,22 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+
+    @Operation(
+            summary = "Logout user",
+            description = "Logs out the user by blacklisting the JWT token so it can't be reused."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Successfully logged out",
+                    content = @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = ApiResponse.class))),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Missing or invalid Authorization header",
+                    content = @Content),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "401", description = "Unauthorized - Token is invalid or expired",
+                    content = @Content),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content)
+    })
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<Object>> logout(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
@@ -154,6 +204,16 @@ public class AuthController {
         }
     }
 
+    @Operation(
+            summary = "Request for forgot-password",
+            description = "Generates a password reset token for the user and sends a reset link via email.",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Password reset link sent",
+                            content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User not found",
+                            content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+            }
+    )
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<Object>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         try {
@@ -167,6 +227,16 @@ public class AuthController {
         }
     }
 
+    @Operation(
+            summary = "Request for Reset password",
+            description = "Resets the password using a valid reset token.",
+            responses = {
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Password reset successful",
+                            content = @Content(schema = @Schema(implementation = ApiResponse.class))),
+                    @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "Invalid token or bad request",
+                            content = @Content(schema = @Schema(implementation = ApiResponse.class)))
+            }
+    )
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<Object>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         try {
