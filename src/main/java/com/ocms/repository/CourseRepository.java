@@ -6,5 +6,5 @@ import java.util.List;
 public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByStatus(CourseStatus status);
 
-    Long id(Long id);
+    //Long id(Long id);
 }

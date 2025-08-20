@@ -15,9 +15,11 @@ public class Enrollment {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "student_id", nullable = false)
+    //@JsonBackReference
     private User student;
 
     @ManyToOne @JoinColumn(name = "course_id", nullable = false)
+    //@JsonBackReference
     private Course course;
 
     private boolean paymentDone = false;

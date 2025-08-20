@@ -18,6 +18,7 @@ public interface CourseService {
     Course getCourseById(Long courseId);
 
     List<Course> getAllApprovedCourses();
+    List<Course> getAllCourses();
 
     void approveCourse(Long courseId);
 
@@ -26,4 +27,8 @@ public interface CourseService {
     List<User> getEnrolledStudents(Long courseId);
 
     Course addReview(Long courseId, ReviewRequest req, String studentEmail);
+
+    List<Course> getAllRejectedCourse();
+
+    List<Course> getAllPendingCourses();
 }

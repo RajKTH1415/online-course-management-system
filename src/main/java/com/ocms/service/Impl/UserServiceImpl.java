@@ -70,6 +70,4 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(username)
                 .orElseThrow(() -> new CustomException("User not found: " + username));
     }
-
-
 }

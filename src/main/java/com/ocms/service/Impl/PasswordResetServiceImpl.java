@@ -7,7 +7,6 @@ import com.ocms.service.PasswordResetService;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,7 +15,6 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final EmailServiceImpl emailService;
 
 
@@ -26,7 +24,6 @@ public class PasswordResetServiceImpl implements PasswordResetService {
 
         this.emailService = emailService1;
     }
-
     @Override
     public String generateResetToken(String username) {
 
@@ -62,7 +59,6 @@ public class PasswordResetServiceImpl implements PasswordResetService {
         if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
             throw new CustomException("Token has expired");
         }
-
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setResetToken(null);
         user.setResetTokenExpiry(null);

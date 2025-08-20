@@ -13,6 +13,7 @@ import java.security.Principal;
 @RequestMapping("/api/student")
 @PreAuthorize("hasRole('STUDENT')")
 public class StudentController {
+
     @Autowired
     private CourseService courseService;
     @Autowired

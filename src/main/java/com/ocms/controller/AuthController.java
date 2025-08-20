@@ -27,6 +27,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -156,8 +157,9 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<ApiResponse<Object>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         try {
-            passwordResetService.generateResetToken(request.getUsername());
-            return ResponseEntity.ok(new ApiResponse<>(true, "Rest link sent to your  mail", null));
+            //passwordResetService.generateResetToken(request.getUsername());// this is for mail
+            String token = passwordResetService.generateResetToken(request.getUsername());
+            return ResponseEntity.ok(new ApiResponse<>(true, "Rest link sent to your  mail", token));
         } catch (CustomException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new ApiResponse<>(false, e.getMessage(), null, "USER_NOT_FOUND"));
@@ -176,7 +178,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ApiResponse<>(false, e.getMessage(), null, "INVALID_TOKEN"));
         }
-
     }
 }
 

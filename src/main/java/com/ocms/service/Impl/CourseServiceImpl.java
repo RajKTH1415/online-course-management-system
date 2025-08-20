@@ -98,6 +98,11 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
+    public List<Course> getAllCourses() {
+        return courseRepository.findAll();
+    }
+
+    @Override
     public void approveCourse(Long courseId) {
         Course c = courseRepository.findById(courseId).orElseThrow(() -> new CustomException("Course not found"));
         c.setStatus(CourseStatus.APPROVED);
@@ -128,5 +133,15 @@ public class CourseServiceImpl implements CourseService {
         reviewRepository.save(r);
         course.getReviews().add(r);
         return courseRepository.save(course);
+    }
+
+    @Override
+    public List<Course> getAllRejectedCourse() {
+       return courseRepository.findByStatus(CourseStatus.REJECTED);
+    }
+
+    @Override
+    public List<Course> getAllPendingCourses() {
+        return courseRepository.findByStatus(CourseStatus.PENDING);
     }
 }
