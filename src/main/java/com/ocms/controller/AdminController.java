@@ -1,6 +1,7 @@
 package com.ocms.controller;
 
 import com.ocms.dtos.ApiResponse;
+import com.ocms.entity.User;
 import com.ocms.service.CourseService;
 import com.ocms.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,7 +23,6 @@ public class AdminController {
     private CourseService courseService;
     @Autowired
     private UserService userService;
-
 
 
     @Operation(
@@ -79,9 +79,14 @@ public class AdminController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User not found", content = @Content)
     })
     @PutMapping("/users/{id}/block")
-    public ResponseEntity<?> blockUser(@PathVariable Long id) {
-        userService.blockUser(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<User>> blockUser(@PathVariable Long id) {
+        User blockUser = userService.blockUser(id);
+        ApiResponse<User> response = new ApiResponse<>(
+                true,
+                "User blocked successfully",
+                blockUser
+        );
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
@@ -98,8 +103,13 @@ public class AdminController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User not found", content = @Content)
     })
     @PutMapping("/users/{id}/unblock")
-    public ResponseEntity<?> unblockUser(@PathVariable Long id) {
-        userService.unblockUser(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<User>> unblockUser(@PathVariable Long id) {
+        User unblockUser = userService.unblockUser(id);
+        ApiResponse<User> response = new ApiResponse<>(
+                true,
+                "User unblock successfully",
+                unblockUser
+        );
+        return ResponseEntity.ok(response);
     }
 }

@@ -7,8 +7,8 @@ import com.ocms.entity.User;
 public interface UserService  {
     User register(RegisterRequest req);
     User findByEmail(String email);
-    void blockUser(Long id);
-    void unblockUser(Long id);
+    User blockUser(Long id);
+    User unblockUser(Long id);
 
     User findByUsername(String username);
 
