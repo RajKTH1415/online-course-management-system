@@ -20,9 +20,9 @@ public interface CourseService {
     List<Course> getAllApprovedCourses();
     List<Course> getAllCourses();
 
-    void approveCourse(Long courseId);
+    Course approveCourse(Long courseId);
 
-    void rejectCourse(Long courseId);
+    Course rejectCourse(Long courseId);
 
     List<User> getEnrolledStudents(Long courseId);
 

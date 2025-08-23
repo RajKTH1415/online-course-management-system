@@ -103,17 +103,17 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void approveCourse(Long courseId) {
+    public Course approveCourse(Long courseId) {
         Course c = courseRepository.findById(courseId).orElseThrow(() -> new CustomException("Course not found"));
         c.setStatus(CourseStatus.APPROVED);
-        courseRepository.save(c);
+       return courseRepository.save(c);
     }
 
     @Override
-    public void rejectCourse(Long courseId) {
+    public Course rejectCourse(Long courseId) {
         Course c = courseRepository.findById(courseId).orElseThrow(() -> new CustomException("Course not found"));
         c.setStatus(CourseStatus.REJECTED);
-        courseRepository.save(c);
+        return courseRepository.save(c);
     }
 
     @Override

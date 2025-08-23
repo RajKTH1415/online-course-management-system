@@ -1,6 +1,7 @@
 package com.ocms.controller;
 
 import com.ocms.dtos.ApiResponse;
+import com.ocms.entity.Course;
 import com.ocms.entity.User;
 import com.ocms.service.CourseService;
 import com.ocms.service.UserService;
@@ -39,9 +40,14 @@ public class AdminController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Course not found", content = @Content)
     })
     @PutMapping("/courses/{id}/approve")
-    public ResponseEntity<?> approveCourse(@PathVariable Long id) {
-        courseService.approveCourse(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<Course>> approveCourse(@PathVariable Long id) {
+       Course approveCourse =  courseService.approveCourse(id);
+       ApiResponse<Course> response = new ApiResponse<>(
+               true,
+               "Course approved successfully",
+               approveCourse
+       );
+        return ResponseEntity.ok(response);
     }
 
 
@@ -59,9 +65,14 @@ public class AdminController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Course not found", content = @Content)
     })
     @PutMapping("/courses/{id}/reject")
-    public ResponseEntity<?> rejectCourse(@PathVariable Long id) {
-        courseService.rejectCourse(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ApiResponse<Course>> rejectCourse(@PathVariable Long id) {
+       Course rejectCourse =  courseService.rejectCourse(id);
+       ApiResponse<Course> response = new ApiResponse<>(
+               true,
+               "Course rejected successfully",
+               rejectCourse
+       );
+        return ResponseEntity.ok(response);
     }
 
 
