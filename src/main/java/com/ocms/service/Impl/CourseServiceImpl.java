@@ -6,7 +6,9 @@ import com.ocms.dtos.ReviewRequest;
 import com.ocms.entity.*;
 import com.ocms.enums.CourseStatus;
 import com.ocms.enums.Role;
+import com.ocms.exception.AccessDeniedException;
 import com.ocms.exception.CustomException;
+import com.ocms.exception.ResourceNotFoundException;
 import com.ocms.repository.*;
 import com.ocms.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,9 +81,9 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public void deleteCourse(Long courseId, String instructorEmail) {
-        Course c = courseRepository.findById(courseId).orElseThrow(() -> new CustomException("Course not found"));
+        Course c = courseRepository.findById(courseId).orElseThrow(() -> new ResourceNotFoundException("Course not found"));
         if (!c.getInstructor().getEmail().equals(instructorEmail) && c.getInstructor().getRole()!=Role.ADMIN) {
-            throw new CustomException("Not authorized to delete");
+            throw new AccessDeniedException("Not authorized to delete");
         }
         courseRepository.delete(c);
     }

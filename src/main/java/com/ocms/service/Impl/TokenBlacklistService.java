@@ -19,7 +19,6 @@ public class TokenBlacklistService {
         if (!jwtUtil.validate(token)) {
             throw new IllegalArgumentException("Invalid token");
         }
-        // Add token to blacklist so it cannot be reused
         blacklist.add(token);
     }
     public boolean isTokenBlacklisted(String token){

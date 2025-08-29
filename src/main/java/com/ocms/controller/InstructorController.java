@@ -2,6 +2,7 @@ package com.ocms.controller;
 
 import com.ocms.dtos.ApiResponse;
 import com.ocms.dtos.CourseRequest;
+import com.ocms.entity.Course;
 import com.ocms.service.CourseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -81,11 +83,16 @@ public class InstructorController {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Course not found", content = @Content)
     })
     @DeleteMapping("/courses/{id}")
-    public ResponseEntity<?> deleteCourse(@PathVariable Long id, Principal principal) {
+    public ResponseEntity<ApiResponse<Void>> deleteCourse(@PathVariable Long id, Principal principal) {
         courseService.deleteCourse(id, principal.getName());
-        return ResponseEntity.ok("Course has been deleted");
-
+        ApiResponse<Void> response = new ApiResponse<>(
+                true,
+                "Course deleted successfully",
+                null
+        );
+        return ResponseEntity.ok(response);
     }
+
 
     @Operation(summary = "Get course by ID", description = "Fetch details of a course by its ID")
     @ApiResponses(value = {

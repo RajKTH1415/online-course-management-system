@@ -50,4 +50,13 @@ public class ApiResponse<T> {
         this.errorCode = errorCode;
         this.timestamp = LocalDateTime.now();
     }
+    public static <T> ApiResponse<T> success(T data) {
+        return ApiResponse.<T>builder()
+                .success(true)
+                .message("Request processed successfully")
+                .data(data)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
 }

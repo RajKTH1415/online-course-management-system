@@ -1,5 +1,6 @@
 package com.ocms.controller;
 
+import com.ocms.dtos.LessonCompletionResponse;
 import com.ocms.dtos.ReviewRequest;
 import com.ocms.service.CourseService;
 import com.ocms.service.EnrollmentService;
@@ -68,9 +69,17 @@ public class StudentController {
             }
     )
     @PostMapping("/courses/{courseId}/lessons/{lessonId}/complete")
-    public ResponseEntity<?> completeLesson(@PathVariable Long courseId, @PathVariable Long lessonId, Principal principal) {
+    public ResponseEntity<com.ocms.dtos.ApiResponse<LessonCompletionResponse>> completeLesson(@PathVariable Long courseId, @PathVariable Long lessonId, Principal principal) {
         enrollmentService.completeLesson(courseId, lessonId, principal.getName());
-        return ResponseEntity.ok().build();
+
+
+        LessonCompletionResponse responseData = new LessonCompletionResponse(courseId, lessonId);
+
+        return ResponseEntity.ok(
+                com.ocms.dtos.ApiResponse.success(responseData, "Lesson marked as completed successfully")
+        );
+
+       // return ResponseEntity.ok().build();
     }
 
 
