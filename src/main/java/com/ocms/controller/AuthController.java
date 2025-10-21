@@ -144,8 +144,6 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
-
-
     @Operation(
             summary = "Logout user",
             description = "Logs out the user by blacklisting the JWT token so it can't be reused."
@@ -203,7 +201,6 @@ public class AuthController {
                     ));
         }
     }
-
     @Operation(
             summary = "Request for forgot-password",
             description = "Generates a password reset token for the user and sends a reset link via email.",

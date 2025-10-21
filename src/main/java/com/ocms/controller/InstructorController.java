@@ -92,8 +92,6 @@ public class InstructorController {
         );
         return ResponseEntity.ok(response);
     }
-
-
     @Operation(summary = "Get course by ID", description = "Fetch details of a course by its ID")
     @ApiResponses(value = {
             @io.swagger.v3.oas.annotations.responses.ApiResponse(

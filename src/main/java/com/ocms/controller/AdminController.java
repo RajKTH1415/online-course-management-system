@@ -74,8 +74,6 @@ public class AdminController {
        );
         return ResponseEntity.ok(response);
     }
-
-
     @Operation(
             summary = "Block a user",
             description = "Blocks a user account so they can no longer access the system (Admin only)."
